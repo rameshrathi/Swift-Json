@@ -9,10 +9,12 @@ final class JSONTests: XCTestCase {
         { "1" : "Hola" }
         """
         var json = try JSON(string: jsonString)
-        XCTAssertNotNil(json["1"] == "Hola")
+        let value = json["1"] as? String
+        XCTAssert(value == "Hola")
 
-        try json.add("test", key: "1")
-        XCTAssert(json["2"] == "test")
+        try json.insert("test", key: "2")
+        let value2 = json["2"] as? String
+        XCTAssert(value2 == "test")
     }
 
     func testArray() throws {
@@ -21,10 +23,10 @@ final class JSONTests: XCTestCase {
         [ "Hola" ]
         """
         var json = try JSON(string: jsonString)
-        XCTAssertNotNil(json[0] == "Hola")
+        XCTAssertNotNil(json[0] as? String == "Hola")
 
         try json.append("test")
-        XCTAssert(json[1] == "test")
+        XCTAssert(json[1] as? String == "test")
     }
 
     func testString() throws {

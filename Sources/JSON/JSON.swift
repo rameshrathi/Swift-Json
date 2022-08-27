@@ -30,7 +30,7 @@ import Foundation
     /// You can pass decoder object to parse custom date types or other types
     public init(data: Data, decoder: JSONDecoder = DefaultJSONDecoder()) throws {
         let object: JSON = try DefaultJSONDecoder().decode(JSON.self, from: data)
-        self._value = object
+        self._value = object._value
     }
 
     /// Init from string will decode string it into json object
@@ -43,35 +43,35 @@ import Foundation
     }
 
     // subscript to get item from array
-    subscript(index: Int) -> JSON {
+    subscript(index: Int) -> Any? {
         get {
-            guard let array = _value as? [JSON] else {
+            guard let array = _value as? [Any] else {
                 return nil
             }
             return array[index]
         }
         set(newValue) {
-            guard var array = _value as? [JSON] else {
+            guard var array = _value as? [Any], let value = newValue else {
                 return
             }
-            array[index] = newValue
-            self = .init(array)
+            array[index] = value
+            self._value = array
         }
     }
 
-    subscript(key: AnyHashable) -> JSON {
+    subscript(key: AnyHashable) -> Any? {
         get {
-            guard let map = _value as? [AnyHashable: JSON], let value = map[key] else {
+            guard let map = _value as? [AnyHashable: Any], let value = map[key] else {
                 return nil
             }
             return value
         }
         set(newValue) {
-            guard var map = _value as? [AnyHashable: JSON] else {
+            guard var map = _value as? [AnyHashable: Any], let value = newValue else {
                 return
             }
-            map[key] = newValue
-            self = .init(map)
+            map[key] = value
+            self._value = map
         }
     }
 
@@ -147,10 +147,10 @@ import Foundation
 
 extension JSON {
     public mutating func append(_ item: JSON) throws {
-        guard var array = _value as? [JSON] else {
+        guard var array = _value as? [Any] else {
             throw JSONError.typeMismatch
         }
-        array.append(item)
+        array.append(item._value)
         self = .init(array)
     }
     public mutating func insert(_ item: JSON, index: Int) throws {
@@ -160,11 +160,11 @@ extension JSON {
         array.insert(item, at: index)
         self = .init(array)
     }
-    public mutating func add(_ item: JSON, key: AnyHashable) throws {
-        guard var map = _value as? [AnyHashable: JSON] else {
+    public mutating func insert(_ item: JSON, key: AnyHashable) throws {
+        guard var map = _value as? [AnyHashable: Any] else {
             throw JSONError.typeMismatch
         }
-        map[key] = item
+        map[key] = item._value
         self = .init(map)
     }
 }
