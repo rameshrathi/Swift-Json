@@ -8,11 +8,13 @@ final class JSONTests: XCTestCase {
         """
         { "1" : "Hola" }
         """
-        let json = try JSON(jsonString)
-        XCTAssertNotNil(json["1"]?.asString() == "Hola")
+        var json = try JSON(string: jsonString)
+        let value = json["1"] as? String
+        XCTAssert(value == "Hola")
 
-        let updated = try json.setValue("Test", key: "2")
-        XCTAssert(updated["2"]?.asString() == "Test")
+        try json.insert("test", key: "2")
+        let value2 = json["2"] as? String
+        XCTAssert(value2 == "test")
     }
 
     func testArray() throws {
@@ -20,29 +22,31 @@ final class JSONTests: XCTestCase {
         """
         [ "Hola" ]
         """
-        let json = try JSON(jsonString)
-        XCTAssertNotNil(json[0]?.asString() == "Hola")
+        var json = try JSON(string: jsonString)
+        XCTAssertNotNil(json[0] as? String == "Hola")
 
-        let updated = try json.appending("Test")
-        XCTAssert(updated[1]?.asString() == "Test")
+        try json.append("test")
+        XCTAssert(json[1] as? String == "test")
     }
 
     func testString() throws {
         let jsonString =
         """
-        [ "Hola" ]
+        "Hola"
         """
-        let json = try JSON(jsonString)
-        XCTAssert(json.asString() == nil)
-        XCTAssert(json[0]?.asString() != nil)
+        let json = try JSON(string: jsonString)
+        XCTAssert(json == "Hola")
+        let value: String? = try? json.value()
+        XCTAssertNotNil(value)
     }
 
     func testNumber() throws {
         let jsonString =
         """
-        { "value": 16615836 }
+        1213
         """
-        let json = try JSON(jsonString)
-        XCTAssert(json["value"]?.asInt() != nil)
+        let json = try JSON(string: jsonString)
+        let value: Int? = try? json.value()
+        XCTAssertNotNil(value)
     }
 }
