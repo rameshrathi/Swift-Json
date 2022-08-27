@@ -16,7 +16,7 @@ public enum JSONError: Error {
 
 public struct JSON {
 
-    let value: AnyCodable
+    public var value: AnyCodable
 
     /// Currently using unix timestamp(seconds) for default date encoding/decoding
     /// You can pass decoder object to parse custom date types or other types
@@ -37,18 +37,36 @@ public struct JSON {
     }
 
     // subscript to get item from array
-    subscript(index: Int) -> JSON? {
-        guard let array = value.value as? [Any] else {
-            return nil
+    subscript(index: Int) -> AnyCodable {
+        get {
+            guard let array = value.value as? [AnyCodable] else {
+                return nil
+            }
+            return array[index]
         }
-        return JSON(value: AnyCodable(array[index]))
+        set(newValue) {
+            guard var array = value.value as? [AnyCodable] else {
+                return
+            }
+            array[index] = newValue
+            self.value = .init(array)
+        }
     }
 
-    subscript(key: AnyHashable) -> JSON? {
-        guard let map = value.value as? [AnyHashable: Any], let value = map[key] else {
-            return nil
+    subscript(key: AnyHashable) -> AnyCodable {
+        get {
+            guard let map = value.value as? [AnyHashable: AnyCodable], let value = map[key] else {
+                return nil
+            }
+            return value
         }
-        return JSON(value: AnyCodable(value))
+        set(newValue) {
+            guard var map = value.value as? [AnyHashable: AnyCodable] else {
+                return
+            }
+            map[key] = newValue
+            self.value = .init(map)
+        }
     }
 }
 
@@ -108,25 +126,26 @@ extension JSON {
 }
 
 extension JSON {
-    public func appending(_ item: Any) throws -> JSON {
-        guard let array = value.value as? [Any] else {
+    public mutating func append(_ item: AnyCodable) throws {
+        guard var array = value.value as? [AnyCodable] else {
             throw JSONError.typeMismatch
         }
-        return JSON(value: .init(array + [item]))
+        array.append(item)
+        self.value = .init(array)
     }
-    public func inserting(_ item: Any, index: Int) throws -> JSON {
-        guard var array = value.value as? [Any] else {
+    public mutating func insert(_ item: AnyCodable, index: Int) throws {
+        guard var array = value.value as? [AnyCodable] else {
             throw JSONError.typeMismatch
         }
         array.insert(item, at: index)
-        return JSON(value: .init(array))
+        self.value = .init(array)
     }
-    public func setValue(_ item: Any, key: AnyHashable) throws -> JSON {
-        guard var map = value.value as? [AnyHashable: Any] else {
+    public mutating func add(_ item: AnyCodable, key: AnyHashable) throws {
+        guard var map = value.value as? [AnyHashable: AnyCodable] else {
             throw JSONError.typeMismatch
         }
         map[key] = item
-        return JSON(value: .init(map))
+        self.value = .init(map)
     }
 }
 

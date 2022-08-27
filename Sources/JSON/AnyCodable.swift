@@ -10,13 +10,12 @@ import Foundation
 @frozen public struct AnyCodable: Codable {
     public let value: Any
 
-    public init<T>(_ value: T?) {
+    public init(_ value: Any?) {
         self.value = value ?? ()
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-
         if container.decodeNil() {
             self.init(Optional<Self>.none)
         } else if let bool = try? container.decode(Bool.self) {
@@ -195,10 +194,53 @@ extension AnyCodable: CustomDebugStringConvertible {
     }
 }
 
-//extension AnyCodable: ExpressibleByNilLiteral {}
-//extension AnyCodable: ExpressibleByBooleanLiteral {}
-//extension AnyCodable: ExpressibleByIntegerLiteral {}
-//extension AnyCodable: ExpressibleByFloatLiteral {}
-//extension AnyCodable: ExpressibleByStringLiteral {}
-//extension AnyCodable: ExpressibleByArrayLiteral {}
-//extension AnyCodable: ExpressibleByDictionaryLiteral {}
+extension AnyCodable: ExpressibleByNilLiteral {
+    public init(nilLiteral: ()) {
+        self.value = ()
+    }
+}
+
+extension AnyCodable: ExpressibleByBooleanLiteral {
+    public typealias BooleanLiteralType = Bool
+    public init(booleanLiteral value: Bool) {
+        self.value = value
+    }
+}
+
+extension AnyCodable: ExpressibleByIntegerLiteral {
+    public typealias IntegerLiteralType = Int
+    public init(integerLiteral value: Int) {
+        self.value = value
+    }
+}
+
+extension AnyCodable: ExpressibleByFloatLiteral {
+    public typealias FloatLiteralType = Double
+    public init(floatLiteral value: Double) {
+        self.value = value
+    }
+}
+
+extension AnyCodable: ExpressibleByStringLiteral {
+    public typealias StringLiteralType = String
+    public init(stringLiteral value: String) {
+        self.value = value
+    }
+}
+
+extension AnyCodable: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = AnyCodable
+
+    public init(arrayLiteral elements: AnyCodable...) {
+        self.value = Array(elements)
+    }
+}
+
+extension AnyCodable: ExpressibleByDictionaryLiteral {
+    public typealias Key = AnyHashable
+    public typealias Value = AnyCodable
+
+    public init(dictionaryLiteral elements: (AnyHashable, AnyCodable)...) {
+        self.value = Dictionary<Key, Value>(uniqueKeysWithValues: elements)
+    }
+}
