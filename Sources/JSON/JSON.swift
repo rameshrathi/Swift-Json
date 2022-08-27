@@ -37,15 +37,20 @@ public struct JSON {
         self.value = value
     }
 
-    // subscript
-//    subscript(index: Int) -> JSON? {
-//        get {
-//
-//        }
-//        set(newValue) {
-//
-//        }
-//    }
+    // subscript to get item from array
+    subscript(index: Int) -> JSON? {
+        guard let array = value.value as? [Any] else {
+            return nil
+        }
+        return JSON(value: AnyCodable(array[index]))
+    }
+
+    subscript(key: AnyHashable) -> JSON? {
+        guard let map = value.value as? [AnyHashable: Any], let value = map[key] else {
+            return nil
+        }
+        return JSON(value: AnyCodable(value))
+    }
 }
 
 /// Decoding or parsing as JSON
