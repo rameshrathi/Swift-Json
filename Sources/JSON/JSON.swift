@@ -32,4 +32,45 @@ public struct JSON {
         }
         try self.init(data)
     }
+
+    public init(value: AnyCodable) {
+        self.value = value
+    }
+
+    // subscript
+//    subscript(index: Int) -> JSON? {
+//        get {
+//
+//        }
+//        set(newValue) {
+//
+//        }
+//    }
+}
+
+/// Decoding or parsing as JSON
+extension JSON {
+    public func asData()-> Data? {
+        try? DefaultJsonEncoder().encode(value)
+    }
+
+    public func asInt() -> Int? {
+        value.value as? Int
+    }
+
+    public func asString() -> String? {
+        value.value as? String
+    }
+
+    public func asDouble() -> Double? {
+        value.value as? Double
+    }
+
+    public func asFloat() -> CGFloat? {
+        value.value as? CGFloat
+    }
+
+    public func asUInt() -> UInt? {
+        value.value as? UInt
+    }
 }
