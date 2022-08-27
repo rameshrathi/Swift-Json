@@ -7,7 +7,12 @@
 
 import Foundation
 
-public class DefaultJsonDecoder: JSONDecoder {
+public enum JSONError: Error {
+    case typeMismatch
+    case notJSONString
+}
+
+public class DefaultJSONDecoder: JSONDecoder {
     public override init() {
         super.init()
         keyDecodingStrategy = .convertFromSnakeCase
@@ -15,7 +20,7 @@ public class DefaultJsonDecoder: JSONDecoder {
     }
 }
 
-public class DefaultJsonEncoder: JSONEncoder {
+public class DefaultJSONEncoder: JSONEncoder {
     public override init() {
         super.init()
         keyEncodingStrategy = .convertToSnakeCase
