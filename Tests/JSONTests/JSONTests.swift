@@ -36,4 +36,13 @@ final class JSONTests: XCTestCase {
         XCTAssert(json.asString() == nil)
         XCTAssert(json[0]?.asString() != nil)
     }
+
+    func testNumber() throws {
+        let jsonString =
+        """
+        { "value": 16615836 }
+        """
+        let json = try JSON(jsonString)
+        XCTAssert(json["value"]?.asInt() != nil)
+    }
 }

@@ -18,16 +18,18 @@ public struct JSON {
 
     let value: AnyCodable
 
-    public init(_ data: Data) throws {
+    /// Currently using unix timestamp(seconds) for default date encoding/decoding
+    /// You can pass decoder object to parse custom date types or other types
+    public init(_ data: Data, decoder: JSONDecoder = DefaultJsonDecoder()) throws {
         let object: AnyCodable = try DefaultJsonDecoder().decode(AnyCodable.self, from: data)
         self.value = object
     }
 
-    public init(_ string: String) throws {
+    public init(_ string: String, decoder: JSONDecoder = DefaultJsonDecoder()) throws {
         guard let data = string.data(using: .utf8) else {
             throw JSONError.notJsonString
         }
-        try self.init(data)
+        try self.init(data, decoder: decoder)
     }
 
     public init(value: AnyCodable) {
@@ -52,7 +54,7 @@ public struct JSON {
 
 /// Decoding or parsing as JSON
 extension JSON {
-    public func asData()-> Data? {
+    public func asData(encoder: JSONEncoder = DefaultJsonEncoder())-> Data? {
         try? DefaultJsonEncoder().encode(value)
     }
 
