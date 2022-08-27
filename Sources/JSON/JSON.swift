@@ -7,13 +7,10 @@ import Foundation
 /// Codable related errors
 public enum JSONError: Error {
     case notJsonString
-    case decodingError(String)
-    case encodingError(String)
-    case someFieldsMissing
+    case typeMismatch
 }
 
-/// JSON Manipulation Object, Parsing and editing json is very easy in swift now
-/// Use DSL like methods to edit/change data in the json object
+/// JSON parsing and editing using `JSON` object
 /// - Create JSON object from data serialized using utf-8 encoding
 /// - Create JSON object from string
 
@@ -59,8 +56,8 @@ extension JSON {
         try? DefaultJsonEncoder().encode(value)
     }
 
-    public func asInt() -> Int? {
-        value.value as? Int
+    public func asBool() -> Bool? {
+        value.value as? Bool
     }
 
     public func asString() -> String? {
@@ -75,7 +72,59 @@ extension JSON {
         value.value as? CGFloat
     }
 
+    public func asInt() -> Int? {
+        value.value as? Int
+    }
+
     public func asUInt() -> UInt? {
         value.value as? UInt
     }
+
+    public func asInt8() -> Int8? {
+        value.value as? Int8
+    }
+
+    public func asUInt8() -> UInt8? {
+        value.value as? UInt8
+    }
+
+    public func asInt32() -> Int32? {
+        value.value as? Int32
+    }
+
+    public func asUInt32() -> UInt32? {
+        value.value as? UInt32
+    }
+
+    public func asInt64() -> Int64? {
+        value.value as? Int64
+    }
+
+    public func asUInt64() -> UInt64? {
+        value.value as? UInt64
+    }
 }
+
+extension JSON {
+    public func appending(_ item: Any) throws -> JSON {
+        guard let array = value.value as? [Any] else {
+            throw JSONError.typeMismatch
+        }
+        return JSON(value: .init(array + [item]))
+    }
+    public func inserting(_ item: Any, index: Int) throws -> JSON {
+        guard var array = value.value as? [Any] else {
+            throw JSONError.typeMismatch
+        }
+        array.insert(item, at: index)
+        return JSON(value: .init(array))
+    }
+    public func setValue(_ item: Any, key: AnyHashable) throws -> JSON {
+        guard var map = value.value as? [AnyHashable: Any] else {
+            throw JSONError.typeMismatch
+        }
+        map[key] = item
+        return JSON(value: .init(map))
+    }
+}
+
